@@ -748,6 +748,7 @@ MODEL_FOR_CAUSAL_LM_MAPPING_NAMES = OrderedDict(
         ("seed_oss", "SeedOssForCausalLM"),
         ("smollm3", "SmolLM3ForCausalLM"),
         ("speech_to_text_2", "Speech2Text2ForCausalLM"),
+        ("solar_open", "SolarOpenForCausalLM"),
         ("stablelm", "StableLmForCausalLM"),
         ("starcoder2", "Starcoder2ForCausalLM"),
         ("transfo-xl", "TransfoXLLMHeadModel"),

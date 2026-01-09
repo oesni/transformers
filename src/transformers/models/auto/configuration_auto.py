@@ -457,6 +457,7 @@ CONFIG_MAPPING_NAMES = OrderedDict[str, str](
         ("zamba", "ZambaConfig"),
         ("zamba2", "Zamba2Config"),
         ("zoedepth", "ZoeDepthConfig"),
+        ("solar_open", "SolarOpenConfig"),
     ]
 )
 
@@ -835,6 +836,7 @@ MODEL_NAMES_MAPPING = OrderedDict[str, str](
         ("smollm3", "SmolLM3"),
         ("smolvlm", "SmolVLM"),
         ("smolvlm_vision", "SmolVLMVisionTransformer"),
+        ("solar_open", "SolarOpen"),
         ("speech-encoder-decoder", "Speech Encoder decoder"),
         ("speech_to_text", "Speech2Text"),
         ("speech_to_text_2", "Speech2Text2"),
