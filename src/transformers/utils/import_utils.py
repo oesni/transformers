@@ -146,6 +146,24 @@ KERNELS_MAX_VERSION = "0.16.0"
 MISTRAL_COMMON_MIN_VERSION = "1.11.5"
 
 
+def _make_compile_constant(fn):
+    """Mark `fn`'s result as a trace-time constant, so `torch.compile` inlines it instead of tracing it.
+
+    This is `torch._dynamo.assume_constant_result`, spelled without importing torch: this module is what
+    decides whether torch is installed, so it must never import it (and doing so would pull torch into
+    `import transformers`, which is deliberately torch-free).
+
+    Apply it *under* `@lru_cache`, not above: dynamo steps past the cache wrapper and only reads the
+    marker on the function it actually traces.
+
+    Only for helpers whose answer is fixed for the lifetime of the process — an install probe, a hardware
+    capability, an environment variable. Never for a runtime query such as `is_cuda_stream_capturing`,
+    where inlining a value that legitimately changes would silently bake a transient into the graph.
+    """
+    setattr(fn, "_dynamo_marked_constant", True)
+    return fn
+
+
 @lru_cache
 def is_torch_available() -> bool:
     try:
@@ -867,7 +885,8 @@ def is_mamba_2_ssm_available() -> bool:
 
 
 @lru_cache
-def is_flash_linear_attention_available(min_version: str = "0.2.2"):
+@_make_compile_constant
+def is_flash_linear_attention_available(min_version: str = "0.2.2") -> bool:
     is_available, fla_version = _is_package_available("fla", return_version=True)
     return is_torch_cuda_available() and is_available and version.parse(fla_version) >= version.parse(min_version)
 

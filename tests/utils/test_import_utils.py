@@ -12,6 +12,7 @@ from transformers.utils.import_utils import (
     clear_import_cache,
     is_flash_attn_2_available,
     is_flash_attn_3_available,
+    is_flash_linear_attention_available,
 )
 
 
@@ -57,6 +58,28 @@ def test_is_package_available_edge_cases():
             patch("transformers.utils.import_utils.importlib.import_module", return_value=fake_module),
         ):
             assert _is_package_available(pkg_name, return_version=True) == expected
+
+
+@parameterized.expand(
+    [
+        ("0.4.0", "0.5.0", False),
+        ("0.5.0", "0.5.0", True),
+        ("0.5.1", "0.5.0", True),
+    ]
+)
+def test_flash_linear_attention_min_version(installed_version: str, min_version: str, expected: bool):
+    is_flash_linear_attention_available.cache_clear()
+    try:
+        with (
+            patch(
+                "transformers.utils.import_utils._is_package_available",
+                return_value=(True, installed_version),
+            ),
+            patch("transformers.utils.import_utils.is_torch_cuda_available", return_value=True),
+        ):
+            assert is_flash_linear_attention_available(min_version) is expected
+    finally:
+        is_flash_linear_attention_available.cache_clear()
 
 
 @contextmanager
